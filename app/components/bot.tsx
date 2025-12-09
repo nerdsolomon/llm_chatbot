@@ -18,23 +18,30 @@ const Bot = ({ user, friends, posts }: Props) => {
   const [input, setInput] = useState("");
   const [showChat, setShowChat] = useState(false);
   const [loading, setLoading] = useState(false);
-
+  const chatRef = useRef(null);
   const latest = useRef({ user, messages });
 
   useEffect(() => {
     latest.current = { user, messages };
   }, [user, messages]);
 
+  useEffect(() => {
+    const handleClickOutside = (event: any) => {
+      if (chatRef.current && !chatRef.current.contains(event.target)) setShowChat(false);
+    };
+    if (showChat) document.addEventListener("mousedown", handleClickOutside);
+    else document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showChat]);
+
   const buildInitialPrompt = () => `
   **Profile Information**
   - Name: ${user.firstName} ${user.lastName}
-  - Email: ${user.email}
   - Gender: ${user.gender}
-  - Date of Birth: ${user.dateOfBirth}
+  - Relationship Status: ${user.relationshipStatus}
   - City: ${user.city}
   - State: ${user.state}
   - Country: ${user.country}
-  - Relationship Status: ${user.relationshipStatus}
   - Bio: ${user.bio}
 
   **Recent Posts**:
@@ -43,15 +50,11 @@ const Bot = ({ user, friends, posts }: Props) => {
   **Friends**:
   ${friends
     .filter((f) => f.following == true)
-    .map(
-      (f) => `
+    .map((f) => `
   - ${f.firstName} ${f.lastName}
-    - Bio: ${f.bio}
-    - Email: ${f.email}
     - City: ${f.city}, ${f.state}, ${f.country}
-`
-    )
-    .join("\n")}
+    - Relationship Status: ${f.relationshipStatus}
+  `).join("\n")}
 
   **Guidelines**:
   - Strictly avoid assumptions.
@@ -67,19 +70,17 @@ const Bot = ({ user, friends, posts }: Props) => {
         user: {
           name: `${latest.current.user.firstName} ${latest.current.user.lastName}`,
           gender: latest.current.user.gender,
-          dob: latest.current.user.dateOfBirth,
-          email: latest.current.user.email,
+          relationshipStatus: latest.current.user.relationshipStatus,
+          bio: latest.current.user.bio,
           city: latest.current.user.city,
           state: latest.current.user.state,
           country: latest.current.user.country,
-          relationshipStatus: latest.current.user.relationshipStatus,
-          bio: latest.current.user.bio,
         },
       },
       null,
       2
     );
-
+    
   useEffect(() => {
     const loadInitial = async () => {
       setLoading(true);
@@ -87,11 +88,9 @@ const Bot = ({ user, friends, posts }: Props) => {
         role: "system",
         content: buildInitialPrompt(),
       };
-
       try {
-        const result = await fetchBotResponse({ messages: [systemMsg] });
+        const result = await fetchBotResponse([systemMsg]);
         const botResponse = result.choices?.[0]?.message?.content || "";
-
         setMessages([systemMsg, { role: "assistant", content: botResponse }]);
       } catch (err) {
         setMessages((prev) => [
@@ -99,35 +98,26 @@ const Bot = ({ user, friends, posts }: Props) => {
           { role: "assistant", content: `<b>Connection failed:</b><br>${err}` },
         ]);
       }
-
       setLoading(false);
     };
-
     loadInitial();
   }, []);
 
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
-
     const userMsg: Message = { role: "user", content: input };
-
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
     setLoading(true);
-
     const contextUpdate: Message = {
       role: "system",
       content: buildContextUpdate(),
     };
-
     const history = [contextUpdate, ...latest.current.messages, userMsg];
-
     try {
-      const result = await fetchBotResponse({ messages: history });
-      const botResponse =
-        result?.choices?.[0]?.message?.content || "No response";
-
+      const result = await fetchBotResponse(history);
+      const botResponse = result?.choices?.[0]?.message?.content || "No response";
       setMessages((prev) => [
         ...prev,
         { role: "assistant", content: botResponse },
@@ -138,7 +128,6 @@ const Bot = ({ user, friends, posts }: Props) => {
         { role: "assistant", content: `<b>Connection failed</b><br>${err}` },
       ]);
     }
-
     setLoading(false);
   };
 
@@ -150,10 +139,7 @@ const Bot = ({ user, friends, posts }: Props) => {
       `<a class="underline" href="$1" target="_blank" rel="noopener noreferrer">$1</a>`
     );
     return (
-      <span
-        style={{ whiteSpace: "pre-wrap" }}
-        dangerouslySetInnerHTML={{ __html: text }}
-      />
+      <span style={{ whiteSpace: "pre-wrap" }} dangerouslySetInnerHTML={{ __html: text }}/>
     );
   }
 
@@ -169,7 +155,7 @@ const Bot = ({ user, friends, posts }: Props) => {
       </button>
 
       {showChat && (
-        <div className="fixed bottom-8 right-8 w-96 bg-white border border-gray-300 rounded-lg shadow-xl overflow-hidden z-50">
+        <div ref={chatRef} className="fixed bottom-8 right-8 w-96 bg-white border border-gray-300 rounded-lg shadow-xl overflow-hidden z-50">
           <div className="flex justify-between items-center p-4 border-b border-gray-200">
             <h5 className="text-lg text-blue-500 font-bold">Bot</h5>
             <button

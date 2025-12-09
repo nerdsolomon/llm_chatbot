@@ -4,7 +4,7 @@ export const profile = {
   firstName: "Jason",
   lastName: "Bourne",
   gender: "Male",
-  relationshipStatus: "Single and looking",
+  relationshipStatus: "Single",
   city: "Apapa",
   state: "Lagos",
   country: "Nigeria",
@@ -17,7 +17,7 @@ export const users = [
     following: false,
     firstName: "Jessica",
     lastName: "Dream",
-    bio: "Relationship Coach",
+    relationshipStatus: "Single",
     city: "Queens",
     state: "New York",
     country: "USA",
@@ -26,7 +26,7 @@ export const users = [
     following: false,
     firstName: "Michael",
     lastName: " Cole",
-    bio: "Mental Therapy",
+    relationshipStatus: "Married",
     city: "Ibadan",
     state: "Ogun",
     country: "Nigeria",
@@ -35,7 +35,7 @@ export const users = [
     following: false,
     firstName: "Joyce",
     lastName: " Kim",
-    bio: "Dating Influencer",
+    relationshipStatus: "Divorced",
     city: "Ikeja",
     state: "Lagos",
     country: "Nigeria",
@@ -44,7 +44,7 @@ export const users = [
     following: false,
     firstName: "Mark",
     lastName: " Zuck",
-    bio: "Marriage Coach",
+    relationshipStatus: "Single",
     city: "Lekki",
     state: "Lagos",
     country: "Nigeria",
@@ -53,7 +53,7 @@ export const users = [
     following: false,
     firstName: "Beyonce",
     lastName: " Zeal",
-    bio: "Marriage Counselor",
+    relationshipStatus: "Married",
     city: "Owerri",
     state: "Imo",
     country: "Nigeria",
@@ -62,7 +62,7 @@ export const users = [
     following: false,
     firstName: "Harry",
     lastName: " Gringo",
-    bio: "Personality Psycology",
+    relationshipStatus: "Single",
     city: "Kumasi",
     state: "Accra",
     country: "Ghana",
@@ -72,27 +72,21 @@ export const users = [
 export interface Friend {
   firstName: string;
   lastName: string;
-  email?: string;
-  dateOfBirth?: string;
-  gender?: string;
   relationshipStatus?: string;
   city?: string;
   state?: string;
   country?: string;
-  bio?: string;
   following: boolean
 }
 
 export interface User {
   firstName: string;
   lastName: string;
-  email?: string;
-  dateOfBirth?: string;
+  relationshipStatus?: string;
+  bio?: string;
   gender?: string;
-  relationshipStatus: string;
   city?: string;
   state?: string;
   country?: string;
-  bio?: string;
   imageUrl?: string
 }

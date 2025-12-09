@@ -32,13 +32,10 @@ const Profilecard = ({user, setUser} : Prop) => {
           <option className="text-green-600 font-bold">
             {user.relationshipStatus}
           </option>
-          <option value="Teen (under 18)">Teen (under 18)</option>
-          <option value="Single and looking">Single and looking</option>
-          <option value="Single and not looking">Single and not looking</option>
+          <option value="Single and looking">Single</option>
           <option value="Married">Married</option>
           <option value="Divorced">Divorced</option>
           <option value="In a relationship">In a relationship</option>
-          <option value="Other">Other</option>
         </select>
         <input
           className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
