@@ -18,7 +18,7 @@ const Bot = ({ user, friends, posts }: Props) => {
   const [input, setInput] = useState("");
   const [showChat, setShowChat] = useState(false);
   const [loading, setLoading] = useState(false);
-  const chatRef = useRef(null);
+  const chatRef = useRef<HTMLDivElement>(null);
   const latest = useRef({ user, messages });
 
   useEffect(() => {
